@@ -42,105 +42,122 @@ var fourthIcon = document.querySelector('#fourthIcon');
 var fifthIcon = document.querySelector('#fifthIcon');
 //api key
 var APIkey = '&appid=8bf8eabf7492de904834ed8ef764f0d3';
+var searchCities = [];
+var localStorageCities = JSON.parse(localStorage.getItem('searchCities'));
+
+if (localStorageCities) {
+    searchCities = localStorageCities;
+}
+
+function updateSidebar() {
+    cityList.innerHTML = "";
+    for (let i = 0; i < searchCities.length; i++) {
+        const city = searchCities[i];
+        var newCity = document.createElement('li');
+        newCity.onclick = function () { fetchApi(city) }
 
 
-function fetchApi() {
-    var requestUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + userInput.value + '&units=imperial' + APIkey;
+        newCity.textContent = city;
+
+        newCity.classList.add("list-group-item");
+        cityList.appendChild(newCity);
+
+    }
+}
+
+updateSidebar()
+
+function fetchApi(cityName) {
+    var requestUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + cityName + '&units=imperial' + APIkey;
 
     fetch(requestUrl)
-    .then(function (response) {
+        .then(function (response) {
             return response.json();
         })
-    .then(function (data) {
-        console.log(data)
-     
-        
-       
-        currentIcon.innerHTML = `<img src="icons/${data.weather[0].icon}.png">`;
+        .then(function (data) {
+            console.log(data)
 
 
-        date.textContent = moment().format('MMMM Do YYYY');
-        cityHeader.textContent = data.name;
-        temp.textContent = "Tempurature: " + data.main.temp + ' F';
-        hum.textContent = "Humidity: " + data.main.humidity + '%';
-        windspeed.textContent = "Wind Speed: " + data.wind.speed + ' mph';
-        var latitude = data.coord.lat;
-        var longitude = data.coord.lon;
-        localStorage.setItem('longitude', longitude);
-        localStorage.setItem('latitude', latitude);
-    })
-    .then(() => {
-        fetchApi1()
-    })
 
-    localStorage.setItem(userInput.value, true);
-            
+            currentIcon.innerHTML = `<img src="icons/${data.weather[0].icon}.png">`;
 
-    var newCity = document.createElement('li');
-    newCity.id = 'someId';
 
-    newCity.textContent = userInput.value;
-    
-    newCity.classList.add("list-group-item");
-    cityList.appendChild(newCity);
+            date.textContent = moment().format('MMMM Do YYYY');
+            cityHeader.textContent = data.name;
+            temp.textContent = "Tempurature: " + data.main.temp + ' F';
+            hum.textContent = "Humidity: " + data.main.humidity + '%';
+            windspeed.textContent = "Wind Speed: " + data.wind.speed + ' mph';
+            var latitude = data.coord.lat;
+            var longitude = data.coord.lon;
+            localStorage.setItem('longitude', longitude);
+            localStorage.setItem('latitude', latitude);
+        })
+        .then(() => {
+            fetchApi1()
+        })
 
-    var cityBox = document.querySelector('#someId');
 
-    
+
+
+
 }
 
 function fetchApi1() {
     var latitude = localStorage.getItem('latitude')
     var longitude = localStorage.getItem('longitude')
     var requestUrl2 = "https://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + '&units=imperial' + APIkey
-   
+
     fetch(requestUrl2)
         .then(function (response) {
             return response.json();
         })
-      .then(function (data) {
-        console.log(data)
-        
+        .then(function (data) {
+            console.log(data)
 
-        uv.textContent = 'UV Index: ' + data.current.uvi;
-        cardTemp1.textContent = 'Tempurature: ' + data.daily[0].temp.max + ' F';
-        cardTemp2.textContent = 'Tempurature: ' + data.daily[1].temp.max + ' F';
-        cardTemp3.textContent = 'Tempurature: ' + data.daily[2].temp.max + ' F';
-        cardTemp4.textContent = 'Tempurature: ' + data.daily[3].temp.max + ' F';
-        cardTemp5.textContent = 'Tempurature: ' + data.daily[4].temp.max + ' F';
 
-        cardHum1.textContent = 'Humidity: ' + data.daily[0].humidity + '%';
-        cardHum2.textContent = 'Humidity: ' + data.daily[1].humidity + '%';
-        cardHum3.textContent = 'Humidity: ' + data.daily[2].humidity + '%';
-        cardHum4.textContent = 'Humidity: ' + data.daily[3].humidity + '%';
-        cardHum5.textContent = 'Humidity: ' + data.daily[4].humidity + '%';
+            uv.textContent = 'UV Index: ' + data.current.uvi;
+            cardTemp1.textContent = 'Tempurature: ' + data.daily[0].temp.max + ' F';
+            cardTemp2.textContent = 'Tempurature: ' + data.daily[1].temp.max + ' F';
+            cardTemp3.textContent = 'Tempurature: ' + data.daily[2].temp.max + ' F';
+            cardTemp4.textContent = 'Tempurature: ' + data.daily[3].temp.max + ' F';
+            cardTemp5.textContent = 'Tempurature: ' + data.daily[4].temp.max + ' F';
 
-        firstIcon.innerHTML = `<img src="icons/${data.daily[0].weather[0].icon}.png">`;
-        secondIcon.innerHTML = `<img src="icons/${data.daily[1].weather[0].icon}.png">`;
-        thirdIcon.innerHTML = `<img src="icons/${data.daily[2].weather[0].icon}.png">`;
-        fourthIcon.innerHTML = `<img src="icons/${data.daily[3].weather[0].icon}.png">`;
-        fifthIcon.innerHTML = `<img src="icons/${data.daily[4].weather[0].icon}.png">`;
+            cardHum1.textContent = 'Humidity: ' + data.daily[0].humidity + '%';
+            cardHum2.textContent = 'Humidity: ' + data.daily[1].humidity + '%';
+            cardHum3.textContent = 'Humidity: ' + data.daily[2].humidity + '%';
+            cardHum4.textContent = 'Humidity: ' + data.daily[3].humidity + '%';
+            cardHum5.textContent = 'Humidity: ' + data.daily[4].humidity + '%';
 
-        cardDate1.textContent = moment().add(1, 'days').format('MMMM Do YYYY');
-        cardDate2.textContent = moment().add(2, 'days').format('MMMM Do YYYY');
-        cardDate3.textContent = moment().add(3, 'days').format('MMMM Do YYYY');
-        cardDate4.textContent = moment().add(4, 'days').format('MMMM Do YYYY');
-        cardDate5.textContent = moment().add(5, 'days').format('MMMM Do YYYY');
-        
-        
-    })
+            firstIcon.innerHTML = `<img src="icons/${data.daily[0].weather[0].icon}.png">`;
+            secondIcon.innerHTML = `<img src="icons/${data.daily[1].weather[0].icon}.png">`;
+            thirdIcon.innerHTML = `<img src="icons/${data.daily[2].weather[0].icon}.png">`;
+            fourthIcon.innerHTML = `<img src="icons/${data.daily[3].weather[0].icon}.png">`;
+            fifthIcon.innerHTML = `<img src="icons/${data.daily[4].weather[0].icon}.png">`;
+
+            cardDate1.textContent = moment().add(1, 'days').format('MMMM Do YYYY');
+            cardDate2.textContent = moment().add(2, 'days').format('MMMM Do YYYY');
+            cardDate3.textContent = moment().add(3, 'days').format('MMMM Do YYYY');
+            cardDate4.textContent = moment().add(4, 'days').format('MMMM Do YYYY');
+            cardDate5.textContent = moment().add(5, 'days').format('MMMM Do YYYY');
+
+
+        })
 }
 
 
-fetchButton.addEventListener('click', function(event){
+fetchButton.addEventListener('click', function (event) {
     event.preventDefault();
-    fetchApi()
-    
+    searchCities.push(userInput.value)
+    localStorage.setItem('searchCities', JSON.stringify(searchCities));
+
+    updateSidebar()
+    fetchApi(userInput.value)
+
 });
 
 // cityBox.addEventListener('click',function(event) {  
 //     event.preventDefault();
-    
-    
+
+
 // });
 
